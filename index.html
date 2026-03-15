@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Loan Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --surface2:  #21253a;
+    --border:    #2a2f47;
+    --text:      #e8eaf6;
+    --muted:     #7b80a0;
+    --green:     #22c55e;
+    --green-dim: #16a34a33;
+    --amber:     #f59e0b;
+    --amber-dim: #b4570833;
+    --red:       #ef4444;
+    --red-dim:   #b9151533;
+    --blue:      #6366f1;
+    --blue-dim:  #4338ca33;
+    --cyan:      #06b6d4;
+    --purple:    #a855f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .wrapper { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  header p { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+
+  /* ── Hero cards ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .hero-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px #0006; }
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .hero-card.balance::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+  .hero-card.paid::before   { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+  .hero-card.loans::before  { background: linear-gradient(90deg, var(--amber), #f97316); }
+  .hero-card.rate::before   { background: linear-gradient(90deg, var(--red), var(--amber)); }
+  .card-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .5rem; }
+  .card-value { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; }
+  .card-sub   { font-size: 0.8rem; color: var(--muted); margin-top: .25rem; }
+  .card-value.green  { color: var(--green); }
+  .card-value.amber  { color: var(--amber); }
+  .card-value.red    { color: var(--red); }
+  .card-value.blue   { color: #818cf8; }
+
+  /* ── Section titles ── */
+  .section-title {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* ── Progress section ── */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: .75rem;
+  }
+  .progress-meta strong { color: var(--text); }
+  .progress-track {
+    background: #1e2235;
+    border-radius: 999px;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--green) 0%, var(--cyan) 100%);
+    width: 0%;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    position: relative;
+  }
+  .progress-fill::after {
+    content: attr(data-pct);
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem; font-weight: 700;
+    color: #fff;
+  }
+  .progress-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.78rem; color: var(--muted); margin-top: .6rem;
+  }
+  .progress-milestone {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .milestone {
+    display: flex; align-items: center; gap: .4rem;
+    font-size: 0.78rem; color: var(--muted);
+  }
+  .milestone-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* ── Loan cards ── */
+  .loan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .loan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .loan-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px #0005; }
+  .loan-card.paid { opacity: .5; }
+  .loan-card.high-rate { border-color: #ef444455; }
+  .loan-card.high-rate::after {
+    content: '⚡ Highest Rate';
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--red-dim);
+    color: var(--red);
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    padding: .2rem .5rem; border-radius: 6px;
+    border: 1px solid #ef444433;
+  }
+  .loan-name { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .3rem; }
+  .loan-balance { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+  .loan-balance.zero { color: var(--green); }
+  .loan-info { display: flex; gap: 1rem; margin-top: .75rem; }
+  .loan-pill {
+    display: flex; align-items: center; gap: .3rem;
+    font-size: 0.75rem; font-weight: 600;
+    padding: .2rem .6rem; border-radius: 8px;
+  }
+  .pill-rate.low  { background: var(--green-dim); color: var(--green); }
+  .pill-rate.high { background: var(--red-dim);   color: var(--red); }
+  .pill-status.active { background: var(--blue-dim);  color: #818cf8; }
+  .pill-status.paid   { background: var(--green-dim); color: var(--green); }
+  .loan-bar-wrap { margin-top: 1rem; height: 5px; background: #1e2235; border-radius: 99px; }
+  .loan-bar { height: 100%; border-radius: 99px; transition: width .8s ease; }
+  .loan-interest { font-size: 0.75rem; color: var(--muted); margin-top: .6rem; }
+  .loan-interest span { color: var(--amber); font-weight: 600; }
+
+  /* ── Charts ── */
+  .chart-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  .chart-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+  .chart-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: .4rem; font-size: 0.78rem; color: var(--muted); }
+  .legend-line { width: 20px; height: 3px; border-radius: 3px; }
+  .chart-canvas-wrap { position: relative; height: 300px; }
+  .scenario-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem;
+    margin-top: 1.25rem;
+  }
+  .stat-box {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+  }
+  .stat-box .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .25rem; }
+  .stat-box .stat-val   { font-size: 1.1rem; font-weight: 700; }
+  .stat-box .stat-sub   { font-size: 0.72rem; color: var(--muted); margin-top: .15rem; }
+  .stat-val.green  { color: var(--green); }
+  .stat-val.red    { color: var(--red); }
+  .stat-val.blue   { color: #818cf8; }
+  .stat-val.amber  { color: var(--amber); }
+
+  /* ── Interest breakdown ── */
+  .interest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .interest-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: transform .2s;
+  }
+  .interest-card:hover { transform: translateY(-2px); }
+  .int-loan-name { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .6rem; }
+  .int-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+  .int-label { font-size: 0.82rem; color: var(--muted); }
+  .int-val   { font-size: 0.9rem; font-weight: 600; }
+  .int-sep { border: none; border-top: 1px solid var(--border); margin: .75rem 0; }
+  .int-total-row { display: flex; justify-content: space-between; align-items: center; }
+  .int-total-label { font-size: 0.82rem; font-weight: 600; }
+  .int-total-val   { font-size: 1.1rem; font-weight: 800; color: var(--amber); }
+
+  /* ── Summary interest card ── */
+  .total-interest-banner {
+    background: linear-gradient(135deg, #1a1d27, #21253a);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex; flex-direction: column; gap: .5rem;
+    justify-content: center;
+  }
+
+  /* ── Donut chart ── */
+  .donut-wrap { position: relative; height: 240px; max-width: 240px; margin: 0 auto; }
+  .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .donut-pct { font-size: 1.8rem; font-weight: 800; color: var(--green); }
+  .donut-sub { font-size: 0.72rem; color: var(--muted); }
+
+  /* ── Tooltips ── */
+  .tip {
+    display: inline-block;
+    background: var(--amber-dim);
+    border: 1px solid #f59e0b44;
+    color: var(--amber);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .15rem .45rem;
+    border-radius: 6px;
+    margin-left: .4rem;
+  }
+  .tip.green {
+    background: var(--green-dim);
+    border-color: #22c55e44;
+    color: var(--green);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .card-value { font-size: 1.6rem; }
+    .chart-canvas-wrap { height: 220px; }
+    header h1 { font-size: 1.3rem; }
+  }
+
+  /* ── Fade-in animation ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: fadeUp .5s ease both; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .10s; }
+  .d3 { animation-delay: .15s; }
+  .d4 { animation-delay: .20s; }
+  .d5 { animation-delay: .25s; }
+  .d6 { animation-delay: .30s; }
+  .d7 { animation-delay: .35s; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ── Header ── -->
+  <header class="animate d1">
+    <div class="header-icon">🎓</div>
+    <div>
+      <h1>Student Loan Dashboard</h1>
+      <p>Federal Direct Loans · As of March 2026</p>
+    </div>
+  </header>
+
+  <!-- ── Hero Cards ── -->
+  <div class="hero-grid animate d2">
+    <div class="hero-card balance">
+      <div class="card-label">Current Balance</div>
+      <div class="card-value blue">$47,327.24</div>
+      <div class="card-sub">Across 3 active loans</div>
+    </div>
+    <div class="hero-card paid">
+      <div class="card-label">Total Paid Off</div>
+      <div class="card-value green">$97,672.76</div>
+      <div class="card-sub">From original ~$145,000</div>
+    </div>
+    <div class="hero-card loans">
+      <div class="card-label">Active Loans</div>
+      <div class="card-value amber">3</div>
+      <div class="card-sub">3 loans fully paid off ✅</div>
+    </div>
+    <div class="hero-card rate">
+      <div class="card-label">Weighted Avg Rate</div>
+      <div class="card-value red" id="weighted-rate">4.47%</div>
+      <div class="card-sub">Monthly interest: <span id="monthly-interest-hero">$176</span></div>
+    </div>
+  </div>
+
+  <!-- ── Progress Bar ── -->
+  <div class="progress-section animate d3">
+    <div class="section-title">
+      <span class="dot" style="background:var(--green)"></span>
+      Payoff Journey
+    </div>
+    <div class="progress-meta">
+      <span>Started at <strong>~$145,000</strong></span>
+      <span><strong id="pct-label">67.4%</strong> paid off</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" data-pct="67.4%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>$0</span>
+      <span>$47,327 remaining</span>
+      <span>$145,000</span>
+    </div>
+    <div class="progress-milestone">
+      <div class="milestone"><div class="milestone-dot" style="background:var(--green)"></div> $97,672.76 eliminated</div>
+      <div class="milestone"><div class="milestone-dot" style="background:#818cf8)"></div> 3 loans zeroed out</div>
+      <div class="milestone"><div class="milestone-dot" style="background:var(--amber)"></div> ~$47K to go</div>
+    </div>
+  </div>
+
+  <!-- ── Loan Breakdown ── -->
+  <div class="section-title animate d3">
+    <span class="dot" style="background:#818cf8"></span>
+    Loan Breakdown
+  </div>
+  <div class="loan-grid animate d4" id="loan-grid"></div>
+
+  <!-- ── Payoff Projection ── -->
+  <div class="section-title animate d5">
+    <span class="dot" style="background:var(--cyan)"></span>
+    Payoff Projection
+    <span class="tip">Avalanche Method</span>
+  </div>
+  <div class="chart-section animate d5">
+    <div class="chart-header">
+      <div>
+        <div style="font-size:.85rem;color:var(--muted);max-width:500px;">
+          Compare minimum payments (~$500/mo) vs aggressive paydown ($2,000/mo using the
+          <strong style="color:var(--text)">debt avalanche</strong> — highest interest first.
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-line" style="background:var(--amber)"></div> Minimum (~$500/mo)
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:var(--green)"></div> Aggressive ($2,000/mo)
+        </div>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="payoffChart"></canvas>
+    </div>
+    <div class="scenario-stats" id="scenario-stats"></div>
+  </div>
+
+  <!-- ── Interest Breakdown ── -->
+  <div class="section-title animate d6">
+    <span class="dot" style="background:var(--amber)"></span>
+    Monthly Interest Accrual
+  </div>
+  <div class="interest-grid animate d6">
+    <div class="interest-card" id="interest-cards-wrap"></div>
+    <div class="total-interest-banner animate d6" id="interest-summary"></div>
+  </div>
+
+  <!-- ── Donut ── -->
+  <div class="section-title animate d7">
+    <span class="dot" style="background:var(--purple)"></span>
+    Balance Distribution
+  </div>
+  <div class="chart-section animate d7" style="max-width:500px;">
+    <div class="donut-wrap">
+      <canvas id="donutChart"></canvas>
+      <div class="donut-center">
+        <div class="donut-pct">67.4%</div>
+        <div class="donut-sub">paid off</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+const ORIGINAL = 145000;
+const loans = [
+  { id: '1-05', balance: 21769.94, rate: 0.043,  status: 'active',  plan: 'SAVE' },
+  { id: '1-06', balance: 17127.06, rate: 0.043,  status: 'active',  plan: 'SAVE' },
+  { id: '1-08', balance:  8430.24, rate: 0.0528, status: 'active',  plan: 'SAVE' },
+  { id: '1-01', balance:     0.00, rate: null,   status: 'paid' },
+  { id: '1-03', balance:     0.00, rate: null,   status: 'paid' },
+  { id: '1-07', balance:     0.00, rate: null,   status: 'paid' },
+];
+const active = loans.filter(l => l.status === 'active');
+const totalBal = active.reduce((s, l) => s + l.balance, 0);
+
+// Weighted avg rate
+const weightedRate = active.reduce((s, l) => s + l.balance * l.rate, 0) / totalBal;
+const monthlyInterestTotal = active.reduce((s, l) => s + l.balance * l.rate / 12, 0);
+
+// ── Hero updates ──
+document.getElementById('weighted-rate').textContent = (weightedRate * 100).toFixed(2) + '%';
+document.getElementById('monthly-interest-hero').textContent = '$' + monthlyInterestTotal.toFixed(0);
+
+// ── Progress bar ──
+const pct = ((ORIGINAL - totalBal) / ORIGINAL * 100).toFixed(1);
+document.getElementById('pct-label').textContent = pct + '%';
+setTimeout(() => {
+  const el = document.getElementById('progress-fill');
+  el.style.width = pct + '%';
+}, 200);
+
+// ═══════════════════════════════════════════
+//  LOAN CARDS
+// ═══════════════════════════════════════════
+const maxBal = Math.max(...active.map(l => l.balance));
+const loanColors = { '1-05': '#818cf8', '1-06': '#06b6d4', '1-08': '#ef4444' };
+
+const grid = document.getElementById('loan-grid');
+loans.forEach(loan => {
+  const isPaid    = loan.status === 'paid';
+  const isHighest = loan.rate === Math.max(...active.map(l => l.rate));
+  const color     = loanColors[loan.id] || 'var(--green)';
+  const monthlyInt = loan.balance > 0 ? loan.balance * loan.rate / 12 : 0;
+  const barWidth  = loan.balance > 0 ? (loan.balance / maxBal * 100).toFixed(1) : 0;
+
+  const card = document.createElement('div');
+  card.className = `loan-card${isPaid ? ' paid' : ''}${isHighest && !isPaid ? ' high-rate' : ''}`;
+  card.innerHTML = `
+    <div class="loan-name">Direct Loan ${loan.id}</div>
+    <div class="loan-balance ${isPaid ? 'zero' : ''}">
+      ${isPaid ? '✓ Paid Off' : '$' + loan.balance.toLocaleString('en-US', {minimumFractionDigits:2})}
+    </div>
+    <div class="loan-info">
+      ${loan.rate ? `<div class="loan-pill pill-rate ${isHighest ? 'high' : 'low'}">${(loan.rate*100).toFixed(3)}% APR</div>` : '<div class="loan-pill pill-rate low">Rate N/A</div>'}
+      <div class="loan-pill pill-status ${isPaid ? 'paid' : 'active'}">${isPaid ? 'Paid Off' : loan.plan + ' Plan'}</div>
+    </div>
+    ${!isPaid ? `
+    <div class="loan-bar-wrap"><div class="loan-bar" style="width:${barWidth}%;background:${color}"></div></div>
+    <div class="loan-interest">Monthly interest: <span>$${monthlyInt.toFixed(2)}</span></div>
+    ` : ''}
+  `;
+  grid.appendChild(card);
+});
+
+// ═══════════════════════════════════════════
+//  PAYOFF SIMULATION
+// ═══════════════════════════════════════════
+function simulate(monthlyPayment, avalanche = false) {
+  // Deep-clone loan balances
+  let state = active.map(l => ({ ...l }));
+  let totalInterestPaid = 0;
+  const balanceHistory = [state.reduce((s, l) => s + l.balance, 0)];
+  let month = 0;
+  const MAX_MONTHS = 600;
+
+  while (state.some(l => l.balance > 0.01) && month < MAX_MONTHS) {
+    month++;
+    let payment = monthlyPayment;
+
+    // Accrue interest first
+    state.forEach(l => {
+      const interest = l.balance * l.rate / 12;
+      l.balance += interest;
+      totalInterestPaid += interest;
+    });
+
+    // Minimum interest payment on all (just cover interest first, then principal)
+    // For simplicity: pay interest on all, apply remaining to principal
+    // First pass: apply minimum to each (interest only) then avalanche principal
+
+    if (avalanche) {
+      // Sort by rate descending for avalanche
+      const sorted = [...state].sort((a, b) => b.rate - a.rate);
+      for (const loan of sorted) {
+        if (payment <= 0) break;
+        const pay = Math.min(loan.balance, payment);
+        loan.balance -= pay;
+        payment -= pay;
+        // find loan in state and update
+        const orig = state.find(l => l.id === loan.id);
+        orig.balance = loan.balance;
+      }
+    } else {
+      // Pro-rata distribution
+      const total = state.reduce((s, l) => s + l.balance, 0);
+      state.forEach(l => {
+        if (l.balance <= 0) return;
+        const share = (l.balance / total) * payment;
+        l.balance = Math.max(0, l.balance - share);
+      });
+    }
+
+    // Zero out near-zero
+    state.forEach(l => { if (l.balance < 0.01) l.balance = 0; });
+
+    const remaining = state.reduce((s, l) => s + l.balance, 0);
+    balanceHistory.push(parseFloat(remaining.toFixed(2)));
+
+    if (remaining < 0.01) break;
+  }
+
+  return { months: month, totalInterestPaid, balanceHistory };
+}
+
+const minResult  = simulate(500,  false);
+const aggrResult = simulate(2000, true);
+
+// ═══════════════════════════════════════════
+//  PAYOFF CHART
+// ═══════════════════════════════════════════
+const maxLen = Math.max(minResult.balanceHistory.length, aggrResult.balanceHistory.length);
+const labels = Array.from({ length: maxLen }, (_, i) => {
+  if (i === 0) return 'Now';
+  const yr  = Math.floor(i / 12);
+  const mo  = i % 12;
+  if (mo === 0) return `Yr ${yr}`;
+  if (i % 6 === 0) return `${yr}y ${mo}m`;
+  return '';
+});
+
+// Pad shorter array
+const padArray = (arr, len) => {
+  const out = [...arr];
+  while (out.length < len) out.push(0);
+  return out;
+};
+
+const minData  = padArray(minResult.balanceHistory,  maxLen);
+const aggrData = padArray(aggrResult.balanceHistory, maxLen);
+
+// Downsample for cleaner chart (max ~80 points)
+function downsample(data, lbs, maxPts) {
+  if (data.length <= maxPts) return { data, labels: lbs };
+  const step = Math.ceil(data.length / maxPts);
+  const dOut = [], lOut = [];
+  for (let i = 0; i < data.length; i += step) {
+    dOut.push(data[i]);
+    lOut.push(lbs[i]);
+  }
+  // Ensure last point
+  if (dOut[dOut.length - 1] !== data[data.length - 1]) {
+    dOut.push(data[data.length - 1]);
+    lOut.push(lbs[lbs.length - 1]);
+  }
+  return { data: dOut, labels: lOut };
+}
+
+const ds = downsample(minData, labels, 80);
+const dsAggr = downsample(aggrData, labels, 80);
+
+// Merge labels
+const chartLabels = ds.labels.length >= dsAggr.labels.length ? ds.labels : dsAggr.labels;
+
+const payoffCtx = document.getElementById('payoffChart').getContext('2d');
+new Chart(payoffCtx, {
+  type: 'line',
+  data: {
+    labels: chartLabels,
+    datasets: [
+      {
+        label: 'Minimum (~$500/mo)',
+        data: ds.data,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,0.08)',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.35,
+      },
+      {
+        label: 'Aggressive ($2,000/mo)',
+        data: dsAggr.data,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.35,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1d27',
+        borderColor: '#2a2f47',
+        borderWidth: 1,
+        titleColor: '#e8eaf6',
+        bodyColor: '#7b80a0',
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0})}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#1e2235' },
+        ticks: { color: '#7b80a0', maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
+      },
+      y: {
+        grid: { color: '#1e2235' },
+        ticks: {
+          color: '#7b80a0',
+          callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
+        },
+        min: 0,
+      }
+    }
+  }
+});
+
+// ── Scenario stats ──
+const statsWrap = document.getElementById('scenario-stats');
+const minYr  = Math.floor(minResult.months / 12);
+const minMo  = minResult.months % 12;
+const agYr   = Math.floor(aggrResult.months / 12);
+const agMo   = aggrResult.months % 12;
+const saved  = minResult.totalInterestPaid - aggrResult.totalInterestPaid;
+
+statsWrap.innerHTML = `
+  <div class="stat-box">
+    <div class="stat-label">⏱ Min Payoff Time</div>
+    <div class="stat-val amber">${minYr > 0 ? minYr + 'y ' : ''}${minMo}m</div>
+    <div class="stat-sub">at $500/mo</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">💸 Min Interest Paid</div>
+    <div class="stat-val red">$${minResult.totalInterestPaid.toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+    <div class="stat-sub">total cost of debt</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">🚀 Aggressive Payoff</div>
+    <div class="stat-val green">${agYr > 0 ? agYr + 'y ' : ''}${agMo}m</div>
+    <div class="stat-sub">at $2,000/mo (avalanche)</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">💰 Aggressive Interest</div>
+    <div class="stat-val green">$${aggrResult.totalInterestPaid.toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+    <div class="stat-sub">saves $${saved.toLocaleString('en-US',{maximumFractionDigits:0})} vs min</div>
+  </div>
+`;
+
+// ═══════════════════════════════════════════
+//  INTEREST BREAKDOWN
+// ═══════════════════════════════════════════
+const icWrap = document.getElementById('interest-cards-wrap');
+icWrap.innerHTML = `<div class="int-loan-name">Monthly Interest Per Loan</div>`;
+active.forEach(loan => {
+  const monthly  = loan.balance * loan.rate / 12;
+  const annual   = loan.balance * loan.rate;
+  const isHigh   = loan.rate === Math.max(...active.map(l => l.rate));
+  icWrap.innerHTML += `
+    <div class="int-row">
+      <span class="int-label">Loan ${loan.id} <span style="color:${isHigh ? 'var(--red)' : 'var(--muted)'};">${(loan.rate*100).toFixed(3)}%</span></span>
+      <span class="int-val" style="color:${isHigh ? 'var(--red)' : 'var(--amber)'}">$${monthly.toFixed(2)}/mo</span>
+    </div>
+  `;
+});
+icWrap.innerHTML += `
+  <hr class="int-sep">
+  <div class="int-total-row">
+    <span class="int-total-label">Total Monthly</span>
+    <span class="int-total-val">$${monthlyInterestTotal.toFixed(2)}</span>
+  </div>
+`;
+
+// Summary card
+const annualInterest = monthlyInterestTotal * 12;
+document.getElementById('interest-summary').innerHTML = `
+  <div class="card-label">Interest Summary</div>
+  <div style="margin-top:.5rem;">
+    <div class="int-row" style="margin-bottom:.6rem;">
+      <span class="int-label">Daily accrual</span>
+      <span class="int-val" style="color:var(--amber)">$${(monthlyInterestTotal / 30).toFixed(2)}</span>
+    </div>
+    <div class="int-row" style="margin-bottom:.6rem;">
+      <span class="int-label">Monthly accrual</span>
+      <span class="int-val" style="color:var(--amber)">$${monthlyInterestTotal.toFixed(2)}</span>
+    </div>
+    <div class="int-row" style="margin-bottom:.6rem;">
+      <span class="int-label">Annual accrual</span>
+      <span class="int-val" style="color:var(--red)">$${annualInterest.toFixed(2)}</span>
+    </div>
+    <div class="int-row" style="margin-bottom:.6rem;">
+      <span class="int-label">Weighted avg rate</span>
+      <span class="int-val">${(weightedRate*100).toFixed(3)}%</span>
+    </div>
+    <hr class="int-sep">
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.5;">
+      💡 Every month you carry this balance, you're paying <strong style="color:var(--amber)">$${monthlyInterestTotal.toFixed(0)}</strong> in pure interest.
+      Aggressive paydown saves <strong style="color:var(--green)">$${saved.toLocaleString('en-US',{maximumFractionDigits:0})}</strong> in total interest.
+    </div>
+  </div>
+`;
+
+// ═══════════════════════════════════════════
+//  DONUT CHART
+// ═══════════════════════════════════════════
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Paid Off', 'Loan 1-05 (4.3%)', 'Loan 1-06 (4.3%)', 'Loan 1-08 (5.28%)'],
+    datasets: [{
+      data: [
+        ORIGINAL - totalBal,
+        21769.94,
+        17127.06,
+        8430.24
+      ],
+      backgroundColor: ['#16a34a', '#6366f1', '#06b6d4', '#ef4444'],
+      borderColor: '#0f1117',
+      borderWidth: 3,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#7b80a0',
+          padding: 14,
+          font: { size: 12 },
+          boxWidth: 12,
+          borderRadius: 3,
+        }
+      },
+      tooltip: {
+        backgroundColor: '#1a1d27',
+        borderColor: '#2a2f47',
+        borderWidth: 1,
+        callbacks: {
+          label: ctx => {
+            const val = ctx.parsed;
+            const pct = (val / ORIGINAL * 100).toFixed(1);
+            return ` $${val.toLocaleString('en-US', {maximumFractionDigits:0})} (${pct}%)`;
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
