@@ -598,10 +598,11 @@
     <!-- Lump Sum -->
     <div class="tool-card">
       <div class="tool-title">💣 Lump Sum Impact</div>
-      <div class="tool-desc">Drop a one-time payment. Avalanche — hits 1-08 (5.28%) first.</div>
+      <div class="tool-desc" id="lump-tool-desc">Drop a one-time payment — combined with your slider above. Avalanche method.</div>
       <div class="lump-input-row">
         <input type="number" class="lump-field" id="lump-input" placeholder="e.g. 5000" min="0" />
       </div>
+      <div id="lump-context"></div>
       <div class="result-grid" id="lump-results">
         <div class="result-box">
           <div class="rl">Payoff Date</div>
@@ -883,9 +884,8 @@ function rebuildAll() {
   // Donut
   renderDonut(totalBal);
 
-  // Slider & lump
-  updateSliderResults();
-  updateLumpResults();
+  // Slider & lump (combined — both sections update together)
+  updateCombinedResults();
 }
 
 // ═══════════════════════════════════════════
@@ -1261,71 +1261,86 @@ function renderDonut(totalBal) {
 }
 
 // ═══════════════════════════════════════════
-//  EXTRA PAYMENT SLIDER
+//  COMBINED CALCULATOR (Slider + Lump Sum)
+//  Both sections update together — they share
+//  the same baseline and reference each other.
 // ═══════════════════════════════════════════
-const slider = document.getElementById('extra-payment-slider');
+const slider    = document.getElementById('extra-payment-slider');
+const lumpInput = document.getElementById('lump-input');
 
-function updateSliderResults() {
-  const extra    = parseInt(slider.value, 10);
-  const total    = 500 + extra;
+function updateCombinedResults() {
+  const extra = parseInt(slider.value, 10);
+  const total = 500 + extra; // total monthly payment
+
+  // ── Slider display label ──
   document.getElementById('slider-display').textContent = extra === 0
     ? 'Minimum only ($500/mo)'
     : `+${fmt$0(extra)}/mo  →  ${fmt$0(total)} total`;
 
-  const baseResult  = simulate(500,   true);
-  const extraResult = simulate(total, true);
+  // ── Baseline: minimum payments only, no lump sum ──
+  const baseResult = simulate(500, true, 0);
 
-  const monthsSaved = baseResult.months - extraResult.months;
-  const intSaved    = baseResult.totalInterestPaid - extraResult.totalInterestPaid;
-  const payoffDate  = monthsFromNow(extraResult.months);
+  // ── Slider section: slider monthly vs minimum, no lump sum ──
+  const sliderResult   = simulate(total, true, 0);
+  const slMonthsSaved  = baseResult.months - sliderResult.months;
+  const slIntSaved     = baseResult.totalInterestPaid - sliderResult.totalInterestPaid;
 
-  document.getElementById('sr-date').textContent         = payoffDate;
-  document.getElementById('sr-months-saved').textContent = monthsSaved > 0 ? monthsSaved + ' months' : '—';
-  document.getElementById('sr-interest').textContent     = fmt$0(extraResult.totalInterestPaid);
-  document.getElementById('sr-saved').textContent        = intSaved > 0 ? fmt$0(intSaved) : '—';
-}
+  document.getElementById('sr-date').textContent         = monthsFromNow(sliderResult.months);
+  document.getElementById('sr-months-saved').textContent = slMonthsSaved > 0 ? slMonthsSaved + ' months' : '—';
+  document.getElementById('sr-interest').textContent     = fmt$0(sliderResult.totalInterestPaid);
+  document.getElementById('sr-saved').textContent        = slIntSaved > 0 ? fmt$0(slIntSaved) : '—';
 
-slider.addEventListener('input', updateSliderResults);
+  // ── Update lump section description to reflect current slider total ──
+  const monthlyDesc = extra > 0
+    ? `${fmt$0(total)}/mo (from slider) applied after lump. Avalanche — highest rate first.`
+    : `$500/mo minimum applied after lump. Avalanche — highest rate first.`;
+  document.getElementById('lump-tool-desc').textContent = monthlyDesc;
 
-// ═══════════════════════════════════════════
-//  LUMP SUM
-// ═══════════════════════════════════════════
-const lumpInput = document.getElementById('lump-input');
+  // ── Lump sum section: COMBINED (lump applied upfront + slider monthly) ──
+  const raw     = lumpInput.value.trim();
+  const lump    = parseFloat(raw);
+  const hasLump = raw && !isNaN(lump) && lump > 0;
 
-function updateLumpResults() {
-  const raw  = lumpInput.value.trim();
-  const lump = parseFloat(raw);
-
-  if (!raw || isNaN(lump) || lump <= 0) {
-    document.getElementById('lr-date').textContent        = '—';
+  if (!hasLump) {
+    document.getElementById('lr-date').textContent         = '—';
     document.getElementById('lr-months-saved').textContent = '—';
-    document.getElementById('lr-interest').textContent    = '—';
-    document.getElementById('lr-saved').textContent       = '—';
-    document.getElementById('lump-allocation').innerHTML  = '';
+    document.getElementById('lr-interest').textContent     = '—';
+    document.getElementById('lr-saved').textContent        = '—';
+    document.getElementById('lump-context').innerHTML      = '';
+    document.getElementById('lump-allocation').innerHTML   = '';
     return;
   }
 
-  const baseResult = simulate(500, true);
-  const lumpResult = simulate(500, true, lump);
+  // Combined: lump sum wiped against principal (avalanche), then slider monthly
+  const combinedResult  = simulate(total, true, lump);
+  const combMonthsSaved = baseResult.months - combinedResult.months;
+  const combIntSaved    = baseResult.totalInterestPaid - combinedResult.totalInterestPaid;
 
-  const monthsSaved = baseResult.months - lumpResult.months;
-  const intSaved    = baseResult.totalInterestPaid - lumpResult.totalInterestPaid;
-  const payoffDate  = monthsFromNow(lumpResult.months);
+  document.getElementById('lr-date').textContent         = monthsFromNow(combinedResult.months);
+  document.getElementById('lr-months-saved').textContent = combMonthsSaved > 0 ? combMonthsSaved + ' months' : '0 months';
+  document.getElementById('lr-interest').textContent     = fmt$0(combinedResult.totalInterestPaid);
+  document.getElementById('lr-saved').textContent        = combIntSaved > 0 ? fmt$0(combIntSaved) : '—';
 
-  document.getElementById('lr-date').textContent         = payoffDate;
-  document.getElementById('lr-months-saved').textContent = monthsSaved > 0 ? monthsSaved + ' months' : '0 months';
-  document.getElementById('lr-interest').textContent     = fmt$0(lumpResult.totalInterestPaid);
-  document.getElementById('lr-saved').textContent        = intSaved > 0 ? fmt$0(intSaved) : '—';
+  // ── Combined context caption ──
+  const lumpLabel    = lump >= 1000 ? fmt$0(lump) : fmt$(lump);
+  const monthlyLabel = extra > 0 ? fmt$0(total) + '/mo' : '$500/mo minimum';
+  document.getElementById('lump-context').innerHTML =
+    `<div style="font-size:0.78rem;color:var(--muted);margin-bottom:.75rem;padding:.6rem .9rem;` +
+    `background:var(--surface2);border:1px solid var(--border);border-radius:8px;line-height:1.7;">` +
+    `🧮 <strong style="color:var(--text)">${lumpLabel} lump sum</strong> applied to principal (avalanche), ` +
+    `then <strong style="color:#818cf8">${monthlyLabel}</strong> ongoing — ` +
+    `vs minimum payments baseline` +
+    `</div>`;
 
-  // Show allocation breakdown
-  const balances = loadBalances();
-  const active   = LOAN_META.filter(l => l.status === 'active')
+  // ── Allocation breakdown ──
+  const balances    = loadBalances();
+  const activeLoans = LOAN_META.filter(l => l.status === 'active')
     .map(l => ({ ...l, balance: balances[l.id] ?? LOAN_DEFAULTS[l.id] }))
     .sort((a, b) => b.rate - a.rate);
 
   let remaining = lump;
-  let allocationLines = [];
-  for (const loan of active) {
+  const allocationLines = [];
+  for (const loan of activeLoans) {
     if (remaining <= 0) break;
     const applied = Math.min(loan.balance, remaining);
     allocationLines.push(
@@ -1341,7 +1356,9 @@ function updateLumpResults() {
     '📍 Applied to: ' + allocationLines.join(' → ');
 }
 
-lumpInput.addEventListener('input', updateLumpResults);
+// Both inputs drive the same combined calculation
+slider.addEventListener('input',    updateCombinedResults);
+lumpInput.addEventListener('input', updateCombinedResults);
 
 // ═══════════════════════════════════════════
 //  INITIAL RENDER
