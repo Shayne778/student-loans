@@ -35,7 +35,6 @@
     min-height: 100vh;
   }
 
-  /* ── Layout ── */
   .wrapper { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
   /* ── Header ── */
@@ -57,6 +56,21 @@
   }
   header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
   header p { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+  .header-actions { margin-left: auto; display: flex; gap: .5rem; align-items: center; }
+  .btn-reset {
+    background: var(--red-dim);
+    border: 1px solid #ef444433;
+    color: var(--red);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .35rem .75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-reset:hover { background: #b9151555; }
 
   /* ── Hero cards ── */
   .hero-grid {
@@ -186,9 +200,41 @@
     border: 1px solid #ef444433;
   }
   .loan-name { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .3rem; }
+
+  /* Editable balance */
+  .balance-wrap { display: flex; align-items: baseline; gap: .4rem; }
   .loan-balance { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   .loan-balance.zero { color: var(--green); }
-  .loan-info { display: flex; gap: 1rem; margin-top: .75rem; }
+  .balance-input {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--blue);
+    color: var(--text);
+    width: 170px;
+    outline: none;
+    font-family: inherit;
+    display: none;
+  }
+  .balance-display { cursor: pointer; transition: color .15s; }
+  .balance-display:hover { color: #818cf8; }
+  .edit-hint {
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: none;
+    margin-top: .15rem;
+  }
+  .loan-card:hover .edit-hint { display: block; }
+  .last-updated {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: .2rem;
+    min-height: 1rem;
+  }
+
+  .loan-info { display: flex; gap: 1rem; margin-top: .75rem; flex-wrap: wrap; }
   .loan-pill {
     display: flex; align-items: center; gap: .3rem;
     font-size: 0.75rem; font-weight: 600;
@@ -202,6 +248,115 @@
   .loan-bar { height: 100%; border-radius: 99px; transition: width .8s ease; }
   .loan-interest { font-size: 0.75rem; color: var(--muted); margin-top: .6rem; }
   .loan-interest span { color: var(--amber); font-weight: 600; }
+
+  /* ── Extra Payment Slider Section ── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+  }
+  .tool-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .tool-desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.25rem; }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .6rem;
+  }
+  .slider-label { font-size: 0.82rem; color: var(--muted); }
+  .slider-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #818cf8;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #1e2235;
+    border-radius: 99px;
+    outline: none;
+    margin-bottom: 1.25rem;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px #4338ca44;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    border: none;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .65rem;
+  }
+  .result-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .9rem;
+  }
+  .result-box .rl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .2rem; }
+  .result-box .rv { font-size: 1rem; font-weight: 700; }
+  .result-box .rv.green { color: var(--green); }
+  .result-box .rv.blue  { color: #818cf8; }
+  .result-box .rv.amber { color: var(--amber); }
+  .result-box .rv.red   { color: var(--red); }
+
+  /* Lump Sum */
+  .lump-input-row {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+  }
+  .lump-field {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: .6rem .9rem;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .2s;
+  }
+  .lump-field:focus { border-color: var(--blue); }
+  .lump-allocation {
+    margin-top: .75rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.6;
+    min-height: 2rem;
+  }
+  .lump-allocation strong { color: var(--text); }
 
   /* ── Charts ── */
   .chart-section {
@@ -306,6 +461,8 @@
     .card-value { font-size: 1.6rem; }
     .chart-canvas-wrap { height: 220px; }
     header h1 { font-size: 1.3rem; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
   }
 
   /* ── Fade-in animation ── */
@@ -321,6 +478,13 @@
   .d5 { animation-delay: .25s; }
   .d6 { animation-delay: .30s; }
   .d7 { animation-delay: .35s; }
+  .d8 { animation-delay: .40s; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: .6; }
+  }
+  .saving-pulse { animation: pulse .6s ease 2; }
 </style>
 </head>
 <body>
@@ -333,18 +497,21 @@
       <h1>Student Loan Dashboard</h1>
       <p>Federal Direct Loans · As of March 2026</p>
     </div>
+    <div class="header-actions">
+      <button class="btn-reset" onclick="resetToOriginal()">↺ Reset Balances</button>
+    </div>
   </header>
 
   <!-- ── Hero Cards ── -->
   <div class="hero-grid animate d2">
     <div class="hero-card balance">
       <div class="card-label">Current Balance</div>
-      <div class="card-value blue">$47,327.24</div>
+      <div class="card-value blue" id="hero-total">$47,327.24</div>
       <div class="card-sub">Across 3 active loans</div>
     </div>
     <div class="hero-card paid">
       <div class="card-label">Total Paid Off</div>
-      <div class="card-value green">$97,672.76</div>
+      <div class="card-value green" id="hero-paid">$97,672.76</div>
       <div class="card-sub">From original ~$145,000</div>
     </div>
     <div class="hero-card loans">
@@ -374,13 +541,13 @@
     </div>
     <div class="progress-labels">
       <span>$0</span>
-      <span>$47,327 remaining</span>
+      <span id="remaining-label">$47,327 remaining</span>
       <span>$145,000</span>
     </div>
     <div class="progress-milestone">
-      <div class="milestone"><div class="milestone-dot" style="background:var(--green)"></div> $97,672.76 eliminated</div>
-      <div class="milestone"><div class="milestone-dot" style="background:#818cf8)"></div> 3 loans zeroed out</div>
-      <div class="milestone"><div class="milestone-dot" style="background:var(--amber)"></div> ~$47K to go</div>
+      <div class="milestone"><div class="milestone-dot" style="background:var(--green)"></div> <span id="milestone-paid">$97,672.76 eliminated</span></div>
+      <div class="milestone"><div class="milestone-dot" style="background:#818cf8"></div> 3 loans zeroed out</div>
+      <div class="milestone"><div class="milestone-dot" style="background:var(--amber)"></div> <span id="milestone-remaining">~$47K to go</span></div>
     </div>
   </div>
 
@@ -388,16 +555,83 @@
   <div class="section-title animate d3">
     <span class="dot" style="background:#818cf8"></span>
     Loan Breakdown
+    <span style="font-size:.72rem;color:var(--muted);font-weight:400;margin-left:.25rem;">Click balance to edit</span>
   </div>
   <div class="loan-grid animate d4" id="loan-grid"></div>
 
-  <!-- ── Payoff Projection ── -->
+  <!-- ── Tools: Slider + Lump Sum ── -->
   <div class="section-title animate d5">
+    <span class="dot" style="background:var(--purple)"></span>
+    Payoff Tools
+  </div>
+  <div class="tools-grid animate d5">
+
+    <!-- Extra Payment Slider -->
+    <div class="tool-card">
+      <div class="tool-title">📈 Extra Monthly Payment</div>
+      <div class="tool-desc">Avalanche method — highest rate (1-08 at 5.28%) attacked first</div>
+      <div class="slider-row">
+        <span class="slider-label">Extra payment</span>
+        <span class="slider-val" id="slider-display">+$500/mo</span>
+      </div>
+      <input type="range" id="extra-payment-slider" min="0" max="3000" step="50" value="500" />
+      <div class="result-grid" id="slider-results">
+        <div class="result-box">
+          <div class="rl">Payoff Date</div>
+          <div class="rv green" id="sr-date">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Months Saved</div>
+          <div class="rv blue" id="sr-months-saved">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Total Interest</div>
+          <div class="rv amber" id="sr-interest">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Interest Saved</div>
+          <div class="rv green" id="sr-saved">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lump Sum -->
+    <div class="tool-card">
+      <div class="tool-title">💣 Lump Sum Impact</div>
+      <div class="tool-desc">Drop a one-time payment. Avalanche — hits 1-08 (5.28%) first.</div>
+      <div class="lump-input-row">
+        <input type="number" class="lump-field" id="lump-input" placeholder="e.g. 5000" min="0" />
+      </div>
+      <div class="result-grid" id="lump-results">
+        <div class="result-box">
+          <div class="rl">Payoff Date</div>
+          <div class="rv green" id="lr-date">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Months Saved</div>
+          <div class="rv blue" id="lr-months-saved">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Total Interest</div>
+          <div class="rv amber" id="lr-interest">—</div>
+        </div>
+        <div class="result-box">
+          <div class="rl">Interest Saved</div>
+          <div class="rv green" id="lr-saved">—</div>
+        </div>
+      </div>
+      <div class="lump-allocation" id="lump-allocation"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Payoff Projection ── -->
+  <div class="section-title animate d6">
     <span class="dot" style="background:var(--cyan)"></span>
     Payoff Projection
     <span class="tip">Avalanche Method</span>
   </div>
-  <div class="chart-section animate d5">
+  <div class="chart-section animate d6">
     <div class="chart-header">
       <div>
         <div style="font-size:.85rem;color:var(--muted);max-width:500px;">
@@ -421,25 +655,25 @@
   </div>
 
   <!-- ── Interest Breakdown ── -->
-  <div class="section-title animate d6">
+  <div class="section-title animate d7">
     <span class="dot" style="background:var(--amber)"></span>
     Monthly Interest Accrual
   </div>
-  <div class="interest-grid animate d6">
+  <div class="interest-grid animate d7">
     <div class="interest-card" id="interest-cards-wrap"></div>
-    <div class="total-interest-banner animate d6" id="interest-summary"></div>
+    <div class="total-interest-banner animate d7" id="interest-summary"></div>
   </div>
 
   <!-- ── Donut ── -->
-  <div class="section-title animate d7">
+  <div class="section-title animate d8">
     <span class="dot" style="background:var(--purple)"></span>
     Balance Distribution
   </div>
-  <div class="chart-section animate d7" style="max-width:500px;">
+  <div class="chart-section animate d8" style="max-width:500px;">
     <div class="donut-wrap">
       <canvas id="donutChart"></canvas>
       <div class="donut-center">
-        <div class="donut-pct">67.4%</div>
+        <div class="donut-pct" id="donut-pct">67.4%</div>
         <div class="donut-sub">paid off</div>
       </div>
     </div>
@@ -449,75 +683,115 @@
 
 <script>
 // ═══════════════════════════════════════════
-//  DATA
+//  CONSTANTS & LOAN DEFAULTS
 // ═══════════════════════════════════════════
-const ORIGINAL = 145000;
-const loans = [
-  { id: '1-05', balance: 21769.94, rate: 0.043,  status: 'active',  plan: 'SAVE' },
-  { id: '1-06', balance: 17127.06, rate: 0.043,  status: 'active',  plan: 'SAVE' },
-  { id: '1-08', balance:  8430.24, rate: 0.0528, status: 'active',  plan: 'SAVE' },
-  { id: '1-01', balance:     0.00, rate: null,   status: 'paid' },
-  { id: '1-03', balance:     0.00, rate: null,   status: 'paid' },
-  { id: '1-07', balance:     0.00, rate: null,   status: 'paid' },
+const ORIGINAL_TOTAL = 145000;
+
+const LOAN_DEFAULTS = {
+  '1-05': 21769.94,
+  '1-06': 17127.06,
+  '1-08':  8430.24,
+};
+
+const LOAN_META = [
+  { id: '1-05', rate: 0.043,  status: 'active', plan: 'SAVE' },
+  { id: '1-06', rate: 0.043,  status: 'active', plan: 'SAVE' },
+  { id: '1-08', rate: 0.0528, status: 'active', plan: 'SAVE' },
+  { id: '1-01', rate: null,   status: 'paid' },
+  { id: '1-03', rate: null,   status: 'paid' },
+  { id: '1-07', rate: null,   status: 'paid' },
 ];
-const active = loans.filter(l => l.status === 'active');
-const totalBal = active.reduce((s, l) => s + l.balance, 0);
 
-// Weighted avg rate
-const weightedRate = active.reduce((s, l) => s + l.balance * l.rate, 0) / totalBal;
-const monthlyInterestTotal = active.reduce((s, l) => s + l.balance * l.rate / 12, 0);
-
-// ── Hero updates ──
-document.getElementById('weighted-rate').textContent = (weightedRate * 100).toFixed(2) + '%';
-document.getElementById('monthly-interest-hero').textContent = '$' + monthlyInterestTotal.toFixed(0);
-
-// ── Progress bar ──
-const pct = ((ORIGINAL - totalBal) / ORIGINAL * 100).toFixed(1);
-document.getElementById('pct-label').textContent = pct + '%';
-setTimeout(() => {
-  const el = document.getElementById('progress-fill');
-  el.style.width = pct + '%';
-}, 200);
+const LS_BALANCES  = 'sltracker_loans';
+const LS_UPDATED   = 'sltracker_updated';
 
 // ═══════════════════════════════════════════
-//  LOAN CARDS
+//  LOCALSTORAGE HELPERS
 // ═══════════════════════════════════════════
-const maxBal = Math.max(...active.map(l => l.balance));
-const loanColors = { '1-05': '#818cf8', '1-06': '#06b6d4', '1-08': '#ef4444' };
+function loadBalances() {
+  try {
+    const raw = localStorage.getItem(LS_BALANCES);
+    return raw ? JSON.parse(raw) : { ...LOAN_DEFAULTS };
+  } catch(e) { return { ...LOAN_DEFAULTS }; }
+}
 
-const grid = document.getElementById('loan-grid');
-loans.forEach(loan => {
-  const isPaid    = loan.status === 'paid';
-  const isHighest = loan.rate === Math.max(...active.map(l => l.rate));
-  const color     = loanColors[loan.id] || 'var(--green)';
-  const monthlyInt = loan.balance > 0 ? loan.balance * loan.rate / 12 : 0;
-  const barWidth  = loan.balance > 0 ? (loan.balance / maxBal * 100).toFixed(1) : 0;
+function loadTimestamps() {
+  try {
+    const raw = localStorage.getItem(LS_UPDATED);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
 
-  const card = document.createElement('div');
-  card.className = `loan-card${isPaid ? ' paid' : ''}${isHighest && !isPaid ? ' high-rate' : ''}`;
-  card.innerHTML = `
-    <div class="loan-name">Direct Loan ${loan.id}</div>
-    <div class="loan-balance ${isPaid ? 'zero' : ''}">
-      ${isPaid ? '✓ Paid Off' : '$' + loan.balance.toLocaleString('en-US', {minimumFractionDigits:2})}
-    </div>
-    <div class="loan-info">
-      ${loan.rate ? `<div class="loan-pill pill-rate ${isHighest ? 'high' : 'low'}">${(loan.rate*100).toFixed(3)}% APR</div>` : '<div class="loan-pill pill-rate low">Rate N/A</div>'}
-      <div class="loan-pill pill-status ${isPaid ? 'paid' : 'active'}">${isPaid ? 'Paid Off' : loan.plan + ' Plan'}</div>
-    </div>
-    ${!isPaid ? `
-    <div class="loan-bar-wrap"><div class="loan-bar" style="width:${barWidth}%;background:${color}"></div></div>
-    <div class="loan-interest">Monthly interest: <span>$${monthlyInt.toFixed(2)}</span></div>
-    ` : ''}
-  `;
-  grid.appendChild(card);
-});
+function saveBalance(id, val) {
+  const balances = loadBalances();
+  balances[id] = val;
+  localStorage.setItem(LS_BALANCES, JSON.stringify(balances));
+  const ts = loadTimestamps();
+  ts[id] = Date.now();
+  localStorage.setItem(LS_UPDATED, JSON.stringify(ts));
+}
+
+function resetToOriginal() {
+  localStorage.setItem(LS_BALANCES, JSON.stringify({ ...LOAN_DEFAULTS }));
+  localStorage.setItem(LS_UPDATED, JSON.stringify({}));
+  rebuildAll();
+}
 
 // ═══════════════════════════════════════════
-//  PAYOFF SIMULATION
+//  UTILITY
 // ═══════════════════════════════════════════
-function simulate(monthlyPayment, avalanche = false) {
-  // Deep-clone loan balances
-  let state = active.map(l => ({ ...l }));
+function fmt$(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmt$0(n) {
+  return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+// Convert month offset from now to calendar string "Month YYYY"
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+
+function monthsFromNow(n) {
+  const d = new Date(2026, 2, 1); // March 2026
+  d.setMonth(d.getMonth() + n);
+  return MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function daysAgo(ts) {
+  if (!ts) return null;
+  const diff = Date.now() - ts;
+  const days = Math.floor(diff / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return '1 day ago';
+  return days + ' days ago';
+}
+
+// ═══════════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════════
+function getActiveLoans() {
+  const balances = loadBalances();
+  return LOAN_META
+    .filter(l => l.status === 'active')
+    .map(l => ({ ...l, balance: balances[l.id] ?? LOAN_DEFAULTS[l.id] }));
+}
+
+function simulate(monthlyPayment, avalanche = true, lumpSum = 0) {
+  let state = getActiveLoans().map(l => ({ ...l }));
+
+  // Apply lump sum upfront (avalanche: highest rate first)
+  if (lumpSum > 0) {
+    const sorted = [...state].sort((a, b) => b.rate - a.rate);
+    let remaining = lumpSum;
+    for (const loan of sorted) {
+      if (remaining <= 0) break;
+      const st = state.find(l => l.id === loan.id);
+      const pay = Math.min(st.balance, remaining);
+      st.balance -= pay;
+      remaining -= pay;
+    }
+  }
+
   let totalInterestPaid = 0;
   const balanceHistory = [state.reduce((s, l) => s + l.balance, 0)];
   let month = 0;
@@ -527,31 +801,22 @@ function simulate(monthlyPayment, avalanche = false) {
     month++;
     let payment = monthlyPayment;
 
-    // Accrue interest first
     state.forEach(l => {
       const interest = l.balance * l.rate / 12;
       l.balance += interest;
       totalInterestPaid += interest;
     });
 
-    // Minimum interest payment on all (just cover interest first, then principal)
-    // For simplicity: pay interest on all, apply remaining to principal
-    // First pass: apply minimum to each (interest only) then avalanche principal
-
     if (avalanche) {
-      // Sort by rate descending for avalanche
       const sorted = [...state].sort((a, b) => b.rate - a.rate);
       for (const loan of sorted) {
         if (payment <= 0) break;
-        const pay = Math.min(loan.balance, payment);
-        loan.balance -= pay;
+        const st = state.find(l => l.id === loan.id);
+        const pay = Math.min(st.balance, payment);
+        st.balance -= pay;
         payment -= pay;
-        // find loan in state and update
-        const orig = state.find(l => l.id === loan.id);
-        orig.balance = loan.balance;
       }
     } else {
-      // Pro-rata distribution
       const total = state.reduce((s, l) => s + l.balance, 0);
       state.forEach(l => {
         if (l.balance <= 0) return;
@@ -560,45 +825,177 @@ function simulate(monthlyPayment, avalanche = false) {
       });
     }
 
-    // Zero out near-zero
     state.forEach(l => { if (l.balance < 0.01) l.balance = 0; });
 
-    const remaining = state.reduce((s, l) => s + l.balance, 0);
-    balanceHistory.push(parseFloat(remaining.toFixed(2)));
-
-    if (remaining < 0.01) break;
+    const rem = state.reduce((s, l) => s + l.balance, 0);
+    balanceHistory.push(parseFloat(rem.toFixed(2)));
+    if (rem < 0.01) break;
   }
 
   return { months: month, totalInterestPaid, balanceHistory };
 }
 
-const minResult  = simulate(500,  false);
-const aggrResult = simulate(2000, true);
+// ═══════════════════════════════════════════
+//  CHART INSTANCES (store for updates)
+// ═══════════════════════════════════════════
+let payoffChartInst = null;
+let donutChartInst  = null;
+
+// ═══════════════════════════════════════════
+//  REBUILD ALL — called on balance change
+// ═══════════════════════════════════════════
+function rebuildAll() {
+  const active    = getActiveLoans();
+  const totalBal  = active.reduce((s, l) => s + l.balance, 0);
+  const weightedRate = totalBal > 0
+    ? active.reduce((s, l) => s + l.balance * l.rate, 0) / totalBal
+    : 0;
+  const monthlyInterestTotal = active.reduce((s, l) => s + l.balance * l.rate / 12, 0);
+
+  // Hero cards
+  document.getElementById('hero-total').textContent = fmt$(totalBal);
+  document.getElementById('hero-paid').textContent  = fmt$(ORIGINAL_TOTAL - totalBal);
+  document.getElementById('weighted-rate').textContent = (weightedRate * 100).toFixed(2) + '%';
+  document.getElementById('monthly-interest-hero').textContent = fmt$0(monthlyInterestTotal);
+
+  // Progress bar
+  const pct = ((ORIGINAL_TOTAL - totalBal) / ORIGINAL_TOTAL * 100).toFixed(1);
+  document.getElementById('pct-label').textContent = pct + '%';
+  const pf = document.getElementById('progress-fill');
+  pf.setAttribute('data-pct', pct + '%');
+  setTimeout(() => { pf.style.width = pct + '%'; }, 50);
+  document.getElementById('remaining-label').textContent = fmt$0(totalBal) + ' remaining';
+  document.getElementById('milestone-paid').textContent = fmt$(ORIGINAL_TOTAL - totalBal) + ' eliminated';
+  document.getElementById('milestone-remaining').textContent = '~' + fmt$0(totalBal) + ' to go';
+
+  // Loan cards
+  renderLoanCards(active);
+
+  // Payoff projection chart
+  renderPayoffChart(active, monthlyInterestTotal);
+
+  // Scenario stats
+  renderScenarioStats();
+
+  // Interest breakdown
+  renderInterestBreakdown(active, monthlyInterestTotal);
+
+  // Donut
+  renderDonut(totalBal);
+
+  // Slider & lump
+  updateSliderResults();
+  updateLumpResults();
+}
+
+// ═══════════════════════════════════════════
+//  LOAN CARDS
+// ═══════════════════════════════════════════
+function renderLoanCards(active) {
+  const maxBal = Math.max(...active.map(l => l.balance));
+  const loanColors = { '1-05': '#818cf8', '1-06': '#06b6d4', '1-08': '#ef4444' };
+  const balances   = loadBalances();
+  const timestamps = loadTimestamps();
+  const grid = document.getElementById('loan-grid');
+  grid.innerHTML = '';
+
+  LOAN_META.forEach(loanMeta => {
+    const isPaid    = loanMeta.status === 'paid';
+    const loan      = isPaid ? loanMeta : { ...loanMeta, balance: balances[loanMeta.id] ?? LOAN_DEFAULTS[loanMeta.id] };
+    const isHighest = !isPaid && loanMeta.rate === Math.max(...active.map(l => l.rate));
+    const color     = loanColors[loan.id] || 'var(--green)';
+    const monthlyInt = loan.balance > 0 ? loan.balance * loan.rate / 12 : 0;
+    const barWidth  = (!isPaid && maxBal > 0) ? (loan.balance / maxBal * 100).toFixed(1) : 0;
+    const tsInfo    = (!isPaid && timestamps[loan.id]) ? daysAgo(timestamps[loan.id]) : null;
+
+    const card = document.createElement('div');
+    card.className = `loan-card${isPaid ? ' paid' : ''}${isHighest && !isPaid ? ' high-rate' : ''}`;
+
+    if (isPaid) {
+      card.innerHTML = `
+        <div class="loan-name">Direct Loan ${loan.id}</div>
+        <div class="loan-balance zero">✓ Paid Off</div>
+        <div class="loan-info">
+          <div class="loan-pill pill-rate low">Rate N/A</div>
+          <div class="loan-pill pill-status paid">Paid Off</div>
+        </div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="loan-name">Direct Loan ${loan.id}</div>
+        <div class="balance-wrap">
+          <div class="balance-display loan-balance" id="bal-display-${loan.id}"
+               onclick="startEdit('${loan.id}')" title="Click to edit balance">
+            ${fmt$(loan.balance)}
+          </div>
+          <input class="balance-input" id="bal-input-${loan.id}" type="number"
+                 step="0.01" min="0" value="${loan.balance.toFixed(2)}"
+                 onblur="endEdit('${loan.id}')"
+                 onkeydown="handleBalKey(event,'${loan.id}')" />
+        </div>
+        <div class="edit-hint">✏️ click to edit</div>
+        <div class="last-updated" id="ts-${loan.id}">${tsInfo ? '🕐 Last updated: ' + tsInfo : ''}</div>
+        <div class="loan-info">
+          <div class="loan-pill pill-rate ${isHighest ? 'high' : 'low'}">${(loan.rate*100).toFixed(3)}% APR</div>
+          <div class="loan-pill pill-status active">${loan.plan} Plan</div>
+        </div>
+        <div class="loan-bar-wrap"><div class="loan-bar" style="width:${barWidth}%;background:${color}"></div></div>
+        <div class="loan-interest">Monthly interest: <span>$${monthlyInt.toFixed(2)}</span></div>
+      `;
+    }
+    grid.appendChild(card);
+  });
+}
+
+function startEdit(id) {
+  const display = document.getElementById('bal-display-' + id);
+  const input   = document.getElementById('bal-input-' + id);
+  if (!display || !input) return;
+  display.style.display = 'none';
+  input.style.display   = 'block';
+  input.focus();
+  input.select();
+}
+
+function endEdit(id) {
+  const display = document.getElementById('bal-display-' + id);
+  const input   = document.getElementById('bal-input-' + id);
+  if (!display || !input) return;
+  let val = parseFloat(input.value);
+  if (isNaN(val) || val < 0) {
+    const balances = loadBalances();
+    val = balances[id] ?? LOAN_DEFAULTS[id];
+  }
+  val = Math.round(val * 100) / 100;
+  saveBalance(id, val);
+  display.style.display = 'block';
+  input.style.display   = 'none';
+  rebuildAll();
+}
+
+function handleBalKey(e, id) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    endEdit(id);
+  } else if (e.key === 'Escape') {
+    const display = document.getElementById('bal-display-' + id);
+    const input   = document.getElementById('bal-input-' + id);
+    if (display && input) {
+      display.style.display = 'block';
+      input.style.display   = 'none';
+    }
+  }
+}
 
 // ═══════════════════════════════════════════
 //  PAYOFF CHART
 // ═══════════════════════════════════════════
-const maxLen = Math.max(minResult.balanceHistory.length, aggrResult.balanceHistory.length);
-const labels = Array.from({ length: maxLen }, (_, i) => {
-  if (i === 0) return 'Now';
-  const yr  = Math.floor(i / 12);
-  const mo  = i % 12;
-  if (mo === 0) return `Yr ${yr}`;
-  if (i % 6 === 0) return `${yr}y ${mo}m`;
-  return '';
-});
-
-// Pad shorter array
-const padArray = (arr, len) => {
+function padArray(arr, len) {
   const out = [...arr];
   while (out.length < len) out.push(0);
   return out;
-};
+}
 
-const minData  = padArray(minResult.balanceHistory,  maxLen);
-const aggrData = padArray(aggrResult.balanceHistory, maxLen);
-
-// Downsample for cleaner chart (max ~80 points)
 function downsample(data, lbs, maxPts) {
   if (data.length <= maxPts) return { data, labels: lbs };
   const step = Math.ceil(data.length / maxPts);
@@ -607,7 +1004,6 @@ function downsample(data, lbs, maxPts) {
     dOut.push(data[i]);
     lOut.push(lbs[i]);
   }
-  // Ensure last point
   if (dOut[dOut.length - 1] !== data[data.length - 1]) {
     dOut.push(data[data.length - 1]);
     lOut.push(lbs[lbs.length - 1]);
@@ -615,209 +1011,351 @@ function downsample(data, lbs, maxPts) {
   return { data: dOut, labels: lOut };
 }
 
-const ds = downsample(minData, labels, 80);
-const dsAggr = downsample(aggrData, labels, 80);
+function renderPayoffChart() {
+  const minResult  = simulate(500,  true);
+  const aggrResult = simulate(2000, true);
 
-// Merge labels
-const chartLabels = ds.labels.length >= dsAggr.labels.length ? ds.labels : dsAggr.labels;
+  const maxLen = Math.max(minResult.balanceHistory.length, aggrResult.balanceHistory.length);
+  const labels = Array.from({ length: maxLen }, (_, i) => {
+    if (i === 0) return 'Now';
+    const yr = Math.floor(i / 12);
+    const mo = i % 12;
+    if (mo === 0) return `Yr ${yr}`;
+    if (i % 6 === 0) return `${yr}y ${mo}m`;
+    return '';
+  });
 
-const payoffCtx = document.getElementById('payoffChart').getContext('2d');
-new Chart(payoffCtx, {
-  type: 'line',
-  data: {
-    labels: chartLabels,
-    datasets: [
-      {
-        label: 'Minimum (~$500/mo)',
-        data: ds.data,
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245,158,11,0.08)',
-        borderWidth: 2.5,
-        pointRadius: 0,
-        fill: true,
-        tension: 0.35,
+  const minData  = padArray(minResult.balanceHistory,  maxLen);
+  const aggrData = padArray(aggrResult.balanceHistory, maxLen);
+  const ds       = downsample(minData,  labels, 80);
+  const dsAggr   = downsample(aggrData, labels, 80);
+  const chartLabels = ds.labels.length >= dsAggr.labels.length ? ds.labels : dsAggr.labels;
+
+  const ctx = document.getElementById('payoffChart').getContext('2d');
+
+  if (payoffChartInst) {
+    payoffChartInst.data.labels = chartLabels;
+    payoffChartInst.data.datasets[0].data = ds.data;
+    payoffChartInst.data.datasets[1].data = dsAggr.data;
+    payoffChartInst.update();
+  } else {
+    payoffChartInst = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: 'Minimum (~$500/mo)',
+            data: ds.data,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245,158,11,0.08)',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.35,
+          },
+          {
+            label: 'Aggressive ($2,000/mo)',
+            data: dsAggr.data,
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.08)',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.35,
+          }
+        ]
       },
-      {
-        label: 'Aggressive ($2,000/mo)',
-        data: dsAggr.data,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        borderWidth: 2.5,
-        pointRadius: 0,
-        fill: true,
-        tension: 0.35,
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1a1d27',
-        borderColor: '#2a2f47',
-        borderWidth: 1,
-        titleColor: '#e8eaf6',
-        bodyColor: '#7b80a0',
-        callbacks: {
-          label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0})}`
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1d27',
+            borderColor: '#2a2f47',
+            borderWidth: 1,
+            titleColor: '#e8eaf6',
+            bodyColor: '#7b80a0',
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${fmt$0(ctx.parsed.y)}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#1e2235' },
+            ticks: { color: '#7b80a0', maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
+          },
+          y: {
+            grid: { color: '#1e2235' },
+            ticks: {
+              color: '#7b80a0',
+              callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
+            },
+            min: 0,
+          }
         }
       }
-    },
-    scales: {
-      x: {
-        grid: { color: '#1e2235' },
-        ticks: { color: '#7b80a0', maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
-      },
-      y: {
-        grid: { color: '#1e2235' },
-        ticks: {
-          color: '#7b80a0',
-          callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
-        },
-        min: 0,
-      }
-    }
+    });
   }
-});
+}
 
-// ── Scenario stats ──
-const statsWrap = document.getElementById('scenario-stats');
-const minYr  = Math.floor(minResult.months / 12);
-const minMo  = minResult.months % 12;
-const agYr   = Math.floor(aggrResult.months / 12);
-const agMo   = aggrResult.months % 12;
-const saved  = minResult.totalInterestPaid - aggrResult.totalInterestPaid;
+// ═══════════════════════════════════════════
+//  SCENARIO STATS (for payoff chart)
+// ═══════════════════════════════════════════
+function renderScenarioStats() {
+  const minResult  = simulate(500,  true);
+  const aggrResult = simulate(2000, true);
+  const saved = minResult.totalInterestPaid - aggrResult.totalInterestPaid;
 
-statsWrap.innerHTML = `
-  <div class="stat-box">
-    <div class="stat-label">⏱ Min Payoff Time</div>
-    <div class="stat-val amber">${minYr > 0 ? minYr + 'y ' : ''}${minMo}m</div>
-    <div class="stat-sub">at $500/mo</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-label">💸 Min Interest Paid</div>
-    <div class="stat-val red">$${minResult.totalInterestPaid.toLocaleString('en-US',{maximumFractionDigits:0})}</div>
-    <div class="stat-sub">total cost of debt</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-label">🚀 Aggressive Payoff</div>
-    <div class="stat-val green">${agYr > 0 ? agYr + 'y ' : ''}${agMo}m</div>
-    <div class="stat-sub">at $2,000/mo (avalanche)</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-label">💰 Aggressive Interest</div>
-    <div class="stat-val green">$${aggrResult.totalInterestPaid.toLocaleString('en-US',{maximumFractionDigits:0})}</div>
-    <div class="stat-sub">saves $${saved.toLocaleString('en-US',{maximumFractionDigits:0})} vs min</div>
-  </div>
-`;
+  const minDate  = monthsFromNow(minResult.months);
+  const aggrDate = monthsFromNow(aggrResult.months);
+
+  const statsWrap = document.getElementById('scenario-stats');
+  statsWrap.innerHTML = `
+    <div class="stat-box">
+      <div class="stat-label">⏱ Min Payoff</div>
+      <div class="stat-val amber">${minDate}</div>
+      <div class="stat-sub">at $500/mo · ${minResult.months} months</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">💸 Min Interest Paid</div>
+      <div class="stat-val red">${fmt$0(minResult.totalInterestPaid)}</div>
+      <div class="stat-sub">total cost of debt</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">🚀 Aggressive Payoff</div>
+      <div class="stat-val green">${aggrDate}</div>
+      <div class="stat-sub">at $2,000/mo · ${aggrResult.months} months</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">💰 Interest Saved</div>
+      <div class="stat-val green">${fmt$0(saved)}</div>
+      <div class="stat-sub">vs minimum payments</div>
+    </div>
+  `;
+}
 
 // ═══════════════════════════════════════════
 //  INTEREST BREAKDOWN
 // ═══════════════════════════════════════════
-const icWrap = document.getElementById('interest-cards-wrap');
-icWrap.innerHTML = `<div class="int-loan-name">Monthly Interest Per Loan</div>`;
-active.forEach(loan => {
-  const monthly  = loan.balance * loan.rate / 12;
-  const annual   = loan.balance * loan.rate;
-  const isHigh   = loan.rate === Math.max(...active.map(l => l.rate));
+function renderInterestBreakdown(active, monthlyInterestTotal) {
+  const icWrap = document.getElementById('interest-cards-wrap');
+  icWrap.innerHTML = `<div class="int-loan-name">Monthly Interest Per Loan</div>`;
+  active.forEach(loan => {
+    const monthly = loan.balance * loan.rate / 12;
+    const isHigh  = loan.rate === Math.max(...active.map(l => l.rate));
+    icWrap.innerHTML += `
+      <div class="int-row">
+        <span class="int-label">Loan ${loan.id} <span style="color:${isHigh ? 'var(--red)' : 'var(--muted)'};">${(loan.rate*100).toFixed(3)}%</span></span>
+        <span class="int-val" style="color:${isHigh ? 'var(--red)' : 'var(--amber)'}">$${monthly.toFixed(2)}/mo</span>
+      </div>
+    `;
+  });
   icWrap.innerHTML += `
-    <div class="int-row">
-      <span class="int-label">Loan ${loan.id} <span style="color:${isHigh ? 'var(--red)' : 'var(--muted)'};">${(loan.rate*100).toFixed(3)}%</span></span>
-      <span class="int-val" style="color:${isHigh ? 'var(--red)' : 'var(--amber)'}">$${monthly.toFixed(2)}/mo</span>
+    <hr class="int-sep">
+    <div class="int-total-row">
+      <span class="int-total-label">Total Monthly</span>
+      <span class="int-total-val">$${monthlyInterestTotal.toFixed(2)}</span>
     </div>
   `;
-});
-icWrap.innerHTML += `
-  <hr class="int-sep">
-  <div class="int-total-row">
-    <span class="int-total-label">Total Monthly</span>
-    <span class="int-total-val">$${monthlyInterestTotal.toFixed(2)}</span>
-  </div>
-`;
 
-// Summary card
-const annualInterest = monthlyInterestTotal * 12;
-document.getElementById('interest-summary').innerHTML = `
-  <div class="card-label">Interest Summary</div>
-  <div style="margin-top:.5rem;">
-    <div class="int-row" style="margin-bottom:.6rem;">
-      <span class="int-label">Daily accrual</span>
-      <span class="int-val" style="color:var(--amber)">$${(monthlyInterestTotal / 30).toFixed(2)}</span>
+  const annualInterest = monthlyInterestTotal * 12;
+  const minResult  = simulate(500,  true);
+  const aggrResult = simulate(2000, true);
+  const saved = minResult.totalInterestPaid - aggrResult.totalInterestPaid;
+
+  document.getElementById('interest-summary').innerHTML = `
+    <div class="card-label">Interest Summary</div>
+    <div style="margin-top:.5rem;">
+      <div class="int-row" style="margin-bottom:.6rem;">
+        <span class="int-label">Daily accrual</span>
+        <span class="int-val" style="color:var(--amber)">$${(monthlyInterestTotal / 30).toFixed(2)}</span>
+      </div>
+      <div class="int-row" style="margin-bottom:.6rem;">
+        <span class="int-label">Monthly accrual</span>
+        <span class="int-val" style="color:var(--amber)">$${monthlyInterestTotal.toFixed(2)}</span>
+      </div>
+      <div class="int-row" style="margin-bottom:.6rem;">
+        <span class="int-label">Annual accrual</span>
+        <span class="int-val" style="color:var(--red)">$${annualInterest.toFixed(2)}</span>
+      </div>
+      <div class="int-row" style="margin-bottom:.6rem;">
+        <span class="int-label">Weighted avg rate</span>
+        <span class="int-val">${active.length > 0 ? (active.reduce((s,l)=>s+l.balance*l.rate,0)/active.reduce((s,l)=>s+l.balance,0)*100).toFixed(3) : '0'}%</span>
+      </div>
+      <hr class="int-sep">
+      <div style="font-size:.78rem;color:var(--muted);line-height:1.5;">
+        💡 Every month you carry this balance, you're paying <strong style="color:var(--amber)">$${monthlyInterestTotal.toFixed(0)}</strong> in pure interest.
+        Aggressive paydown saves <strong style="color:var(--green)">${fmt$0(saved)}</strong> in total interest.
+      </div>
     </div>
-    <div class="int-row" style="margin-bottom:.6rem;">
-      <span class="int-label">Monthly accrual</span>
-      <span class="int-val" style="color:var(--amber)">$${monthlyInterestTotal.toFixed(2)}</span>
-    </div>
-    <div class="int-row" style="margin-bottom:.6rem;">
-      <span class="int-label">Annual accrual</span>
-      <span class="int-val" style="color:var(--red)">$${annualInterest.toFixed(2)}</span>
-    </div>
-    <div class="int-row" style="margin-bottom:.6rem;">
-      <span class="int-label">Weighted avg rate</span>
-      <span class="int-val">${(weightedRate*100).toFixed(3)}%</span>
-    </div>
-    <hr class="int-sep">
-    <div style="font-size:.78rem;color:var(--muted);line-height:1.5;">
-      💡 Every month you carry this balance, you're paying <strong style="color:var(--amber)">$${monthlyInterestTotal.toFixed(0)}</strong> in pure interest.
-      Aggressive paydown saves <strong style="color:var(--green)">$${saved.toLocaleString('en-US',{maximumFractionDigits:0})}</strong> in total interest.
-    </div>
-  </div>
-`;
+  `;
+}
 
 // ═══════════════════════════════════════════
 //  DONUT CHART
 // ═══════════════════════════════════════════
-const donutCtx = document.getElementById('donutChart').getContext('2d');
-new Chart(donutCtx, {
-  type: 'doughnut',
-  data: {
-    labels: ['Paid Off', 'Loan 1-05 (4.3%)', 'Loan 1-06 (4.3%)', 'Loan 1-08 (5.28%)'],
-    datasets: [{
-      data: [
-        ORIGINAL - totalBal,
-        21769.94,
-        17127.06,
-        8430.24
-      ],
-      backgroundColor: ['#16a34a', '#6366f1', '#06b6d4', '#ef4444'],
-      borderColor: '#0f1117',
-      borderWidth: 3,
-      hoverOffset: 6,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '68%',
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#7b80a0',
-          padding: 14,
-          font: { size: 12 },
-          boxWidth: 12,
-          borderRadius: 3,
-        }
+function renderDonut(totalBal) {
+  const balances = loadBalances();
+  const pct = ((ORIGINAL_TOTAL - totalBal) / ORIGINAL_TOTAL * 100).toFixed(1);
+  document.getElementById('donut-pct').textContent = pct + '%';
+
+  const b105 = balances['1-05'] ?? LOAN_DEFAULTS['1-05'];
+  const b106 = balances['1-06'] ?? LOAN_DEFAULTS['1-06'];
+  const b108 = balances['1-08'] ?? LOAN_DEFAULTS['1-08'];
+
+  if (donutChartInst) {
+    donutChartInst.data.datasets[0].data = [
+      ORIGINAL_TOTAL - totalBal,
+      b105, b106, b108
+    ];
+    donutChartInst.update();
+  } else {
+    const ctx = document.getElementById('donutChart').getContext('2d');
+    donutChartInst = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Paid Off', 'Loan 1-05 (4.3%)', 'Loan 1-06 (4.3%)', 'Loan 1-08 (5.28%)'],
+        datasets: [{
+          data: [ORIGINAL_TOTAL - totalBal, b105, b106, b108],
+          backgroundColor: ['#16a34a', '#6366f1', '#06b6d4', '#ef4444'],
+          borderColor: '#0f1117',
+          borderWidth: 3,
+          hoverOffset: 6,
+        }]
       },
-      tooltip: {
-        backgroundColor: '#1a1d27',
-        borderColor: '#2a2f47',
-        borderWidth: 1,
-        callbacks: {
-          label: ctx => {
-            const val = ctx.parsed;
-            const pct = (val / ORIGINAL * 100).toFixed(1);
-            return ` $${val.toLocaleString('en-US', {maximumFractionDigits:0})} (${pct}%)`;
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#7b80a0',
+              padding: 14,
+              font: { size: 12 },
+              boxWidth: 12,
+              borderRadius: 3,
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1a1d27',
+            borderColor: '#2a2f47',
+            borderWidth: 1,
+            callbacks: {
+              label: ctx => {
+                const val = ctx.parsed;
+                const p   = (val / ORIGINAL_TOTAL * 100).toFixed(1);
+                return ` ${fmt$0(val)} (${p}%)`;
+              }
+            }
           }
         }
       }
-    }
+    });
   }
-});
+}
+
+// ═══════════════════════════════════════════
+//  EXTRA PAYMENT SLIDER
+// ═══════════════════════════════════════════
+const slider = document.getElementById('extra-payment-slider');
+
+function updateSliderResults() {
+  const extra    = parseInt(slider.value, 10);
+  const total    = 500 + extra;
+  document.getElementById('slider-display').textContent = extra === 0
+    ? 'Minimum only ($500/mo)'
+    : `+${fmt$0(extra)}/mo  →  ${fmt$0(total)} total`;
+
+  const baseResult  = simulate(500,   true);
+  const extraResult = simulate(total, true);
+
+  const monthsSaved = baseResult.months - extraResult.months;
+  const intSaved    = baseResult.totalInterestPaid - extraResult.totalInterestPaid;
+  const payoffDate  = monthsFromNow(extraResult.months);
+
+  document.getElementById('sr-date').textContent         = payoffDate;
+  document.getElementById('sr-months-saved').textContent = monthsSaved > 0 ? monthsSaved + ' months' : '—';
+  document.getElementById('sr-interest').textContent     = fmt$0(extraResult.totalInterestPaid);
+  document.getElementById('sr-saved').textContent        = intSaved > 0 ? fmt$0(intSaved) : '—';
+}
+
+slider.addEventListener('input', updateSliderResults);
+
+// ═══════════════════════════════════════════
+//  LUMP SUM
+// ═══════════════════════════════════════════
+const lumpInput = document.getElementById('lump-input');
+
+function updateLumpResults() {
+  const raw  = lumpInput.value.trim();
+  const lump = parseFloat(raw);
+
+  if (!raw || isNaN(lump) || lump <= 0) {
+    document.getElementById('lr-date').textContent        = '—';
+    document.getElementById('lr-months-saved').textContent = '—';
+    document.getElementById('lr-interest').textContent    = '—';
+    document.getElementById('lr-saved').textContent       = '—';
+    document.getElementById('lump-allocation').innerHTML  = '';
+    return;
+  }
+
+  const baseResult = simulate(500, true);
+  const lumpResult = simulate(500, true, lump);
+
+  const monthsSaved = baseResult.months - lumpResult.months;
+  const intSaved    = baseResult.totalInterestPaid - lumpResult.totalInterestPaid;
+  const payoffDate  = monthsFromNow(lumpResult.months);
+
+  document.getElementById('lr-date').textContent         = payoffDate;
+  document.getElementById('lr-months-saved').textContent = monthsSaved > 0 ? monthsSaved + ' months' : '0 months';
+  document.getElementById('lr-interest').textContent     = fmt$0(lumpResult.totalInterestPaid);
+  document.getElementById('lr-saved').textContent        = intSaved > 0 ? fmt$0(intSaved) : '—';
+
+  // Show allocation breakdown
+  const balances = loadBalances();
+  const active   = LOAN_META.filter(l => l.status === 'active')
+    .map(l => ({ ...l, balance: balances[l.id] ?? LOAN_DEFAULTS[l.id] }))
+    .sort((a, b) => b.rate - a.rate);
+
+  let remaining = lump;
+  let allocationLines = [];
+  for (const loan of active) {
+    if (remaining <= 0) break;
+    const applied = Math.min(loan.balance, remaining);
+    allocationLines.push(
+      `<strong>Loan ${loan.id}</strong> (${(loan.rate*100).toFixed(3)}%): ${fmt$(applied)}`
+    );
+    remaining -= applied;
+  }
+  if (remaining > 0) {
+    allocationLines.push(`<strong style="color:var(--green)">+${fmt$(remaining)} left over</strong> — all loans paid!`);
+  }
+
+  document.getElementById('lump-allocation').innerHTML =
+    '📍 Applied to: ' + allocationLines.join(' → ');
+}
+
+lumpInput.addEventListener('input', updateLumpResults);
+
+// ═══════════════════════════════════════════
+//  INITIAL RENDER
+// ═══════════════════════════════════════════
+rebuildAll();
+
+// Animate progress bar on load
+setTimeout(() => {
+  const balances = loadBalances();
+  const totalBal = Object.values(balances).reduce((s, v) => s + v, 0);
+  const pct = ((ORIGINAL_TOTAL - totalBal) / ORIGINAL_TOTAL * 100).toFixed(1);
+  const pf = document.getElementById('progress-fill');
+  pf.style.width = pct + '%';
+}, 200);
 </script>
 </body>
 </html>
