@@ -485,6 +485,53 @@
     50% { opacity: .6; }
   }
   .saving-pulse { animation: pulse .6s ease 2; }
+
+  /* ── Page Navigation ── */
+  .page-nav {
+    display: flex;
+    gap: .5rem;
+    padding: .5rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-tab {
+    padding: .5rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .9rem;
+    font-family: inherit;
+    transition: background .2s, color .2s;
+  }
+  .nav-tab:hover { background: var(--surface2); color: var(--text); }
+  .nav-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* ── Inflation page layouts ── */
+  #infl-loan-analysis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  #infl-context-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .infl-insight {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    font-size: .88rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+  .infl-insight strong { color: var(--text); }
 </style>
 </head>
 <body>
@@ -501,6 +548,13 @@
       <button class="btn-reset" onclick="resetToOriginal()">↺ Reset Balances</button>
     </div>
   </header>
+
+  <nav class="page-nav">
+    <button class="nav-tab active" onclick="showPage('loans')">Loan Tracker</button>
+    <button class="nav-tab"        onclick="showPage('inflation')">Inflation Tracker</button>
+  </nav>
+
+  <div id="page-loans">
 
   <!-- ── Hero Cards ── -->
   <div class="hero-grid animate d2">
@@ -680,6 +734,94 @@
     </div>
   </div>
 
+  </div><!-- /page-loans -->
+
+  <!-- ══════════════════════════════════════════════
+       INFLATION TRACKER PAGE
+  ══════════════════════════════════════════════ -->
+  <div id="page-inflation" class="page" style="display:none;">
+
+    <!-- Controls -->
+    <div class="tool-card" style="margin-bottom:2rem;">
+      <div class="tool-title">⚙️ Time Value Settings</div>
+      <div class="tool-desc">Adjust the inputs to model how inflation and loan interest affect your money over time.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-top:.75rem;">
+        <div>
+          <div class="slider-label" style="margin-bottom:.4rem;">Dollar Amount</div>
+          <input type="number" class="lump-field" id="infl-amount" value="1000" min="1" step="100" style="width:100%;" />
+        </div>
+        <div>
+          <div class="slider-label" style="margin-bottom:.4rem;">Inflation Rate (%)</div>
+          <input type="number" class="lump-field" id="infl-rate" value="3" min="0" max="20" step="0.1" style="width:100%;" />
+        </div>
+        <div>
+          <div class="slider-label" style="margin-bottom:.4rem;">Investment Return (%)</div>
+          <input type="number" class="lump-field" id="infl-invest-rate" value="7" min="0" max="30" step="0.1" style="width:100%;" />
+        </div>
+        <div>
+          <div class="slider-row" style="margin-bottom:.4rem;">
+            <span class="slider-label">Time Horizon</span>
+            <span class="slider-val" id="infl-years-label">10 yrs</span>
+          </div>
+          <input type="range" id="infl-years" min="1" max="30" step="1" value="10" style="margin-bottom:0;" />
+        </div>
+      </div>
+      <div style="margin-top:.75rem;font-size:.78rem;color:var(--muted);">
+        Weighted avg loan rate: <strong id="infl-weighted-rate" style="color:var(--text);">—</strong>
+      </div>
+    </div>
+
+    <!-- Three Paths hero cards -->
+    <div class="section-title">
+      <span class="dot" style="background:var(--cyan)"></span>
+      Three Paths for Your Dollar
+    </div>
+    <div class="hero-grid" id="infl-hero" style="margin-bottom:2.5rem;"></div>
+
+    <!-- Per-loan analysis -->
+    <div class="section-title">
+      <span class="dot" style="background:var(--amber)"></span>
+      Loan-by-Loan: Cost of Waiting
+    </div>
+    <div id="infl-loan-analysis"></div>
+
+    <!-- Comparison chart -->
+    <div class="section-title">
+      <span class="dot" style="background:var(--purple)"></span>
+      Year-by-Year Comparison
+    </div>
+    <div class="chart-section" style="margin-bottom:2rem;">
+      <div class="chart-header">
+        <div style="font-size:.85rem;color:var(--muted);max-width:500px;">
+          How the same dollar grows or erodes depending on what you do with it.
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-line" style="background:var(--red)"></div> Held as Cash</div>
+          <div class="legend-item"><div class="legend-line" style="background:var(--green)"></div> Loan Payoff Value</div>
+          <div class="legend-item"><div class="legend-line" style="background:#818cf8"></div> Invested</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="infl-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Break-even insight -->
+    <div class="section-title">
+      <span class="dot" style="background:var(--red)"></span>
+      Break-Even Analysis
+    </div>
+    <div class="infl-insight" id="infl-breakeven-wrap"></div>
+
+    <!-- Context cards -->
+    <div class="section-title">
+      <span class="dot" style="background:var(--amber)"></span>
+      What Inflation Does to Everyday Prices
+    </div>
+    <div id="infl-context-cards"></div>
+
+  </div><!-- /page-inflation -->
+
 </div><!-- /wrapper -->
 
 <script>
@@ -839,8 +981,9 @@ function simulate(monthlyPayment, avalanche = true, lumpSum = 0) {
 // ═══════════════════════════════════════════
 //  CHART INSTANCES (store for updates)
 // ═══════════════════════════════════════════
-let payoffChartInst = null;
-let donutChartInst  = null;
+let payoffChartInst    = null;
+let donutChartInst     = null;
+let inflationChartInst = null;
 
 // ═══════════════════════════════════════════
 //  REBUILD ALL — called on balance change
@@ -1373,6 +1516,327 @@ setTimeout(() => {
   const pf = document.getElementById('progress-fill');
   pf.style.width = pct + '%';
 }, 200);
+
+// ═══════════════════════════════════════════
+//  INFLATION TRACKER PAGE
+// ═══════════════════════════════════════════
+
+// ── Page switcher ──
+function showPage(name) {
+  document.getElementById('page-loans').style.display     = name === 'loans'     ? '' : 'none';
+  document.getElementById('page-inflation').style.display = name === 'inflation' ? '' : 'none';
+  document.querySelectorAll('.nav-tab').forEach((t, i) =>
+    t.classList.toggle('active',
+      (name === 'loans' && i === 0) || (name === 'inflation' && i === 1)
+    )
+  );
+  if (name === 'inflation') {
+    rebuildInflation();
+    if (inflationChartInst) inflationChartInst.resize();
+  }
+}
+
+// ── Math helpers ──
+function inflPurchasingPower(pv, rate, years) {
+  return pv / Math.pow(1 + rate, years);
+}
+
+function inflInvestmentGrowth(pv, rate, years) {
+  return pv * Math.pow(1 + rate, years);
+}
+
+function inflWeightedLoanRate() {
+  const loans    = getActiveLoans();
+  const totalBal = loans.reduce((s, l) => s + l.balance, 0);
+  if (totalBal === 0) return 0;
+  return loans.reduce((s, l) => s + (l.rate * l.balance / totalBal), 0);
+}
+
+function inflDailyAccrual(balance, rate) {
+  return (balance * rate) / 365;
+}
+
+function inflInterestSaved(amount) {
+  const base     = simulate(500, true, 0).totalInterestPaid;
+  const withLump = simulate(500, true, amount).totalInterestPaid;
+  return Math.max(0, base - withLump);
+}
+
+// ── Orchestrator ──
+function rebuildInflation() {
+  const amount   = parseFloat(document.getElementById('infl-amount').value)       || 1000;
+  const inflRate = (parseFloat(document.getElementById('infl-rate').value)        || 3)  / 100;
+  const invRate  = (parseFloat(document.getElementById('infl-invest-rate').value) || 7)  / 100;
+  const years    = parseInt(document.getElementById('infl-years').value)           || 10;
+
+  const yLabel = years + ' yr' + (years !== 1 ? 's' : '');
+  document.getElementById('infl-years-label').textContent  = yLabel;
+  document.getElementById('infl-weighted-rate').textContent =
+    (inflWeightedLoanRate() * 100).toFixed(3) + '%';
+
+  renderInflHeroCards(amount, inflRate, invRate, years);
+  renderInflLoanAnalysis(amount);
+  renderInflationChart(amount, inflRate, invRate, years);
+  renderInflBreakEven(inflWeightedLoanRate(), inflRate);
+  renderInflContextCards(inflRate, years);
+}
+
+// ── Three Paths hero cards ──
+function renderInflHeroCards(amount, inflRate, invRate, years) {
+  const cashVal    = inflPurchasingPower(amount, inflRate, years);
+  const loanSaved  = inflInterestSaved(amount);
+  const investVal  = inflInvestmentGrowth(amount, invRate, years);
+  const cashLoss   = amount - cashVal;
+  const investGain = investVal - amount;
+  const yLabel     = years + ' yr' + (years !== 1 ? 's' : '');
+
+  document.getElementById('infl-hero').innerHTML = `
+    <div class="hero-card" style="border-top:3px solid var(--red);">
+      <div class="card-label">📉 Held as Cash</div>
+      <div class="card-value red">${fmt$(cashVal)}</div>
+      <div class="card-sub">Purchasing power in ${yLabel}</div>
+      <div style="margin-top:.5rem;font-size:.78rem;color:var(--muted);">
+        Lost to inflation: <span style="color:var(--red);">${fmt$(cashLoss)}</span>
+      </div>
+    </div>
+    <div class="hero-card" style="border-top:3px solid var(--green);">
+      <div class="card-label">✅ Paid Off Loan</div>
+      <div class="card-value green">${fmt$(loanSaved)}</div>
+      <div class="card-sub">Total interest saved by paying now</div>
+      <div style="margin-top:.5rem;font-size:.78rem;color:var(--muted);">
+        Guaranteed, risk-free "return" on your dollar
+      </div>
+    </div>
+    <div class="hero-card" style="border-top:3px solid #818cf8;">
+      <div class="card-label">📈 Invested</div>
+      <div class="card-value blue">${fmt$(investVal)}</div>
+      <div class="card-sub">At ${(invRate * 100).toFixed(1)}% for ${yLabel}</div>
+      <div style="margin-top:.5rem;font-size:.78rem;color:var(--muted);">
+        Nominal gain: <span style="color:#818cf8;">${fmt$(investGain)}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ── Per-loan analysis cards ──
+function renderInflLoanAnalysis(amount) {
+  const loans = getActiveLoans();
+  const wrap  = document.getElementById('infl-loan-analysis');
+  wrap.innerHTML = '';
+
+  loans.forEach(loan => {
+    const daily   = inflDailyAccrual(loan.balance, loan.rate);
+    const monthly = loan.balance * loan.rate / 12;
+    const annual  = loan.balance * loan.rate;
+    const weekCost = daily * 7;
+
+    const card = document.createElement('div');
+    card.className = 'interest-card';
+    card.innerHTML = `
+      <div class="int-loan-name">Loan ${loan.id} &middot; ${(loan.rate * 100).toFixed(3)}% APR</div>
+      <div class="int-row">
+        <span class="int-label">Balance</span>
+        <span class="int-val">${fmt$(loan.balance)}</span>
+      </div>
+      <div class="int-row">
+        <span class="int-label">Daily interest</span>
+        <span class="int-val" style="color:var(--red)">$${daily.toFixed(2)}/day</span>
+      </div>
+      <div class="int-row">
+        <span class="int-label">Monthly interest</span>
+        <span class="int-val" style="color:var(--amber)">$${monthly.toFixed(2)}/mo</span>
+      </div>
+      <div class="int-row">
+        <span class="int-label">Annual interest</span>
+        <span class="int-val" style="color:var(--amber)">$${annual.toFixed(2)}/yr</span>
+      </div>
+      <hr class="int-sep">
+      <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">
+        Every week you wait costs <strong style="color:var(--red);">$${weekCost.toFixed(2)}</strong> on this loan alone.
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+
+  // Summary card: total interest saved by applying amount now
+  const saved = inflInterestSaved(amount);
+  const summary = document.createElement('div');
+  summary.className = 'total-interest-banner';
+  summary.innerHTML = `
+    <div class="card-label">Apply ${fmt$0(amount)} Now — Total Savings</div>
+    <div class="card-value green" style="font-size:1.8rem;">${fmt$(saved)}</div>
+    <div class="card-sub">Interest avoided (avalanche method, all loans)</div>
+    <hr class="int-sep">
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.6;">
+      💡 This is the guaranteed "return" of paying down debt today — no market risk required.
+    </div>
+  `;
+  wrap.appendChild(summary);
+}
+
+// ── Year-by-year comparison chart ──
+function renderInflationChart(amount, inflRate, invRate, years) {
+  const loanRate   = inflWeightedLoanRate();
+  const labels     = Array.from({ length: years + 1 }, (_, i) => i === 0 ? 'Now' : 'Yr ' + i);
+  const cashData   = labels.map((_, i) => +inflPurchasingPower(amount, inflRate, i).toFixed(2));
+  const loanData   = labels.map((_, i) => +inflInvestmentGrowth(amount, loanRate, i).toFixed(2));
+  const investData = labels.map((_, i) => +inflInvestmentGrowth(amount, invRate, i).toFixed(2));
+
+  const ctx = document.getElementById('infl-chart').getContext('2d');
+
+  if (inflationChartInst) {
+    inflationChartInst.data.labels           = labels;
+    inflationChartInst.data.datasets[0].data = cashData;
+    inflationChartInst.data.datasets[1].data = loanData;
+    inflationChartInst.data.datasets[2].data = investData;
+    inflationChartInst.update();
+  } else {
+    inflationChartInst = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Held as Cash',
+            data: cashData,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239,68,68,0.08)',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.35,
+          },
+          {
+            label: 'Loan Payoff Value',
+            data: loanData,
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.08)',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.35,
+          },
+          {
+            label: 'Invested',
+            data: investData,
+            borderColor: '#818cf8',
+            backgroundColor: 'rgba(129,140,248,0.08)',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.35,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1d27',
+            borderColor: '#2a2f47',
+            borderWidth: 1,
+            titleColor: '#e8eaf6',
+            bodyColor: '#7b80a0',
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${fmt$(ctx.parsed.y)}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#1e2235' },
+            ticks: { color: '#7b80a0', maxRotation: 0, autoSkip: true, maxTicksLimit: 12 }
+          },
+          y: {
+            grid: { color: '#1e2235' },
+            ticks: {
+              color: '#7b80a0',
+              callback: v => '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'K' : v.toFixed(0))
+            },
+            min: 0,
+          }
+        }
+      }
+    });
+  }
+}
+
+// ── Break-even analysis ──
+function renderInflBreakEven(loanRate, inflRate) {
+  const loanPct = (loanRate * 100).toFixed(2);
+  const inflPct = (inflRate * 100).toFixed(1);
+  // Nominal investment return needed to beat paying off debt:
+  // (1 + loanRate) * (1 + inflRate) - 1
+  const nominalNeeded = ((1 + loanRate) * (1 + inflRate) - 1) * 100;
+
+  document.getElementById('infl-breakeven-wrap').innerHTML = `
+    <strong>Your loans average ${loanPct}%.</strong>
+    With inflation at ${inflPct}%, a dollar held as cash loses purchasing power every year.
+    To beat paying off your loans, an investment must return
+    <strong style="color:var(--amber);">${nominalNeeded.toFixed(2)}% annually (nominal)</strong>
+    — that's the loan rate compounded with inflation.<br><br>
+    The S&amp;P 500 has historically averaged ~10% nominal. If you expect sustained returns
+    above <strong style="color:var(--amber);">${nominalNeeded.toFixed(2)}%</strong>,
+    investing may come out ahead over time. Below that threshold,
+    <strong style="color:var(--green);">paying down debt is the guaranteed, risk-free return</strong>.
+  `;
+}
+
+// ── Inflation context cards ──
+const INFL_CONTEXT_ITEMS = [
+  { label: '⛽ Gas (per gallon)',   price: 3.50  },
+  { label: '🛒 Weekly groceries',  price: 100   },
+  { label: '☕ Cup of coffee',     price: 5     },
+  { label: '🏠 Monthly rent',      price: 1500  },
+];
+
+function renderInflContextCards(inflRate, years) {
+  const wrap = document.getElementById('infl-context-cards');
+  wrap.innerHTML = '';
+  const yLabel = years + ' yr' + (years !== 1 ? 's' : '');
+
+  INFL_CONTEXT_ITEMS.forEach(item => {
+    const futurePrice = item.price * Math.pow(1 + inflRate, years);
+    const increase    = futurePrice - item.price;
+    const card = document.createElement('div');
+    card.className = 'interest-card';
+    card.innerHTML = `
+      <div class="int-loan-name">${item.label}</div>
+      <div class="int-row">
+        <span class="int-label">Today</span>
+        <span class="int-val">${fmt$(item.price)}</span>
+      </div>
+      <div class="int-row">
+        <span class="int-label">In ${yLabel}</span>
+        <span class="int-val" style="color:var(--red)">${fmt$(futurePrice)}</span>
+      </div>
+      <hr class="int-sep">
+      <div class="int-total-row">
+        <span class="int-total-label">Price increase</span>
+        <span class="int-total-val" style="color:var(--red)">+${fmt$(increase)}</span>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+// ── Debounce + event wiring ──
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const rebuildInflDebounced = debounce(rebuildInflation, 40);
+
+['infl-amount', 'infl-rate', 'infl-invest-rate', 'infl-years'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    if (document.getElementById('page-inflation').style.display !== 'none') {
+      rebuildInflDebounced();
+    }
+  });
+});
 </script>
 </body>
 </html>
